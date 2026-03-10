@@ -159,6 +159,20 @@
       }
     });
 
+    // Rule 8: self data exchange (from == to)
+    model.exchanges.forEach(function (ex) {
+      if (!ex.from || !ex.to) return;
+      if (ex.from === ex.to) {
+        messages.push(
+          makeMessage(
+            "warning",
+            'Participant "' + ex.from + '" is exchanging data with itself.',
+            { nodeSignature: signatureForNode(ex._node) }
+          )
+        );
+      }
+    });
+
     // Rule 7: exchanges referencing undefined meshes
     model.exchanges.forEach(function (ex) {
       if (ex.mesh && !meshNames[ex.mesh]) {
