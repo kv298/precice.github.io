@@ -32,7 +32,7 @@
       messages.push({
         type: "error",
         title: "XML Parsing Error",
-        text: (line ? "Line " + line + ": " : "") + errorText,
+        text: errorText,
         line: line,
       });
       return { ok: false, xmlDoc: null, messages: messages };

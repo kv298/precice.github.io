@@ -97,6 +97,14 @@
   display: block;
 }
 
+.config-analyzer-panel h2 {
+  margin-top: 0;
+}
+
+.config-analyzer-tab-panels {
+  min-height: 360px;
+}
+
 .config-analyzer-tree-root,
 .config-analyzer-concepts,
 .config-analyzer-graph {

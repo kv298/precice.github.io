@@ -160,6 +160,33 @@
         detail: label,
       };
     }));
+
+    container.appendChild(renderListSection("Exchanges", model.exchanges, function (item) {
+      var label =
+        (item.from || "?") +
+        " → " +
+        (item.to || "?") +
+        (item.data ? " · data=" + item.data : "") +
+        (item.mesh ? " · mesh=" + item.mesh : "");
+      return {
+        title: item.data || "exchange",
+        detail: label,
+      };
+    }));
+
+    container.appendChild(renderListSection("Coupling schemes", model.couplingSchemes, function (item) {
+      var label = item.type || "coupling-scheme";
+      if (item.participants && item.participants.length) {
+        label += " · participants=" + item.participants.join(", ");
+      }
+      if (item.timeWindow) {
+        label += " · time-window=" + item.timeWindow;
+      }
+      return {
+        title: item.name || (item.type || "coupling-scheme"),
+        detail: label,
+      };
+    }));
   }
 
   function renderListSection(title, items, mapItem) {
@@ -253,7 +280,7 @@
   function loadExample() {
     var example = [
       '<?xml version="1.0" encoding="UTF-8"?>',
-      '<precice-configuration>',
+      '<precice-configuration xmlns:coupling-scheme="https://precice.org" xmlns:data="https://precice.org">',
       '  <participants>',
       '    <participant name="FluidSolver">',
       '      <use-mesh name="Fluid-Mesh" />',
@@ -267,6 +294,8 @@
       '    <mesh name="Solid-Mesh" dimensions="3" />',
       '    <mesh name="Interface-Mesh" dimensions="2" />',
       "  </meshes>",
+      "  <data:scalar name=\"Force\" mesh=\"Interface-Mesh\" />",
+      "  <data:vector name=\"Displacement\" mesh=\"Interface-Mesh\" />",
       "  <mappings>",
       '    <mapping name="Fluid-to-Structure" from="Fluid-Mesh" to="Solid-Mesh" type="nearest-neighbor" />',
       "  </mappings>",
