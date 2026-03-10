@@ -12,6 +12,7 @@ Here you will find a few tools to:
 - [Install and use preCICE tools](tooling-cli.html) as a single integrated preCICE CLI.
 - [Simulate and replay coupled simulations in an artificial environment](tooling-aste.html) without actual solvers and adapters.
 - [Check your configuration file](tooling-builtin.html) without starting a whole simulation.
+- [Analyze your configuration in the browser](tooling-config-analyzer.html) to detect common logical issues before running simulations.
 - [Visualize the preCICE configuration file](tooling-config-visualization.html) to understand if you are really asking preCICE to do what you meant to.
 - [Couple your simulation to FMU models](tooling-fmi-runner.html) following the FMI standard.
 - [Set up a coupling between solvers at different scales](tooling-micro-manager-overview.html) to resolve two-scale coupled scenarios using preCICE.

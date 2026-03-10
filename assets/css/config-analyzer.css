@@ -1,0 +1,262 @@
+/* Layout */
+.config-analyzer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.config-analyzer-main {
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.config-analyzer-panel {
+  background: #ffffff;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.config-analyzer-panel-left {
+  flex: 1 1 46%;
+}
+
+.config-analyzer-panel-right {
+  flex: 1 1 54%;
+}
+
+.config-analyzer-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.config-analyzer-file-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  background: #f8f9fa;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.config-analyzer-file-label input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.config-analyzer-loading {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.config-analyzer-textarea {
+  font-family: ui-monospace, SFMonoRegular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.85rem;
+  min-height: 260px;
+  resize: vertical;
+}
+
+.config-analyzer-tabs {
+  display: inline-flex;
+  border-bottom: 1px solid #e1e4e8;
+  margin-bottom: 0.75rem;
+}
+
+.config-analyzer-tab {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  color: #6c757d;
+}
+
+.config-analyzer-tab-active {
+  border-bottom-color: #0a76bb;
+  color: #212529;
+  font-weight: 600;
+}
+
+.config-analyzer-tab-panel {
+  display: none;
+}
+
+.config-analyzer-tab-panel-active {
+  display: block;
+}
+
+.config-analyzer-tree-root,
+.config-analyzer-concepts,
+.config-analyzer-graph {
+  max-height: 420px;
+  overflow: auto;
+  border-radius: 4px;
+  border: 1px solid #e1e4e8;
+  padding: 0.5rem;
+  background: #fafbfc;
+}
+
+.config-analyzer-tree-root {
+  font-family: ui-monospace, SFMonoRegular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.8rem;
+}
+
+.config-analyzer-results {
+  background: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.config-analyzer-summary {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.config-analyzer-messages p {
+  margin: 0 0 0.25rem 0;
+}
+
+.config-analyzer-message {
+  cursor: pointer;
+}
+
+.config-analyzer-message:hover {
+  text-decoration: underline;
+}
+
+.config-analyzer-message-success {
+  color: #2b7a0b;
+}
+
+.config-analyzer-message-warning {
+  color: #b26a00;
+}
+
+.config-analyzer-message-error {
+  color: #b00020;
+}
+
+/* Tree view */
+.config-analyzer-tree {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.config-analyzer-tree-node {
+  margin: 0;
+  padding-left: 0.5rem;
+}
+
+.config-analyzer-tree-header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: default;
+  border-radius: 3px;
+  padding: 0.05rem 0.15rem;
+}
+
+.config-analyzer-tree-header-toggle {
+  cursor: pointer;
+}
+
+.config-analyzer-tree-toggle,
+.config-analyzer-tree-toggle-spacer {
+  width: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.config-analyzer-tree-children {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0.1rem 0 0.1rem 0.25rem;
+}
+
+.config-analyzer-tree-text {
+  font-style: italic;
+}
+
+.config-analyzer-tree-highlight {
+  outline: 2px solid rgba(10, 118, 187, 0.35);
+  background: rgba(10, 118, 187, 0.08);
+}
+
+/* Concepts */
+.config-analyzer-section + .config-analyzer-section {
+  margin-top: 1rem;
+  border-top: 1px solid #e1e4e8;
+  padding-top: 0.75rem;
+}
+
+.config-analyzer-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.25rem 0 0;
+}
+
+.config-analyzer-list-item {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.config-analyzer-entity-title {
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+
+.config-analyzer-entity-detail {
+  font-size: 0.8rem;
+  color: #495057;
+}
+
+/* Graph */
+.config-analyzer-graph svg {
+  width: 100%;
+  height: 360px;
+}
+
+.config-analyzer-graph-node {
+  fill: #0a76bb;
+}
+
+.config-analyzer-graph-node-text {
+  fill: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.config-analyzer-graph-edge {
+  stroke: #5a6470;
+  stroke-width: 2;
+  fill: none;
+}
+
+.config-analyzer-graph-edge-label {
+  fill: #2d333b;
+  font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .config-analyzer-main {
+    flex-direction: column;
+  }
+}
+
