@@ -20,7 +20,7 @@
     }
 
     var width = Math.max(640, container.clientWidth || 640);
-    var height = Math.max(360, participants.length * 70);
+    var height = Math.max(360, participants.length > 6 ? 520 : 420);
 
     var svg = createSvg("svg");
     svg.setAttribute("viewBox", "0 0 " + width + " " + height);
@@ -41,56 +41,94 @@
     svg.appendChild(defs);
 
     var padX = 28;
-    var padY = 22;
+    var padY = 28;
     var nodeW = 170;
     var nodeH = 34;
-    var leftX = padX;
-    var rightX = width - padX - nodeW;
-    var columnGap = rightX - leftX - nodeW;
 
-    // Place participants alternately left/right to reduce edge overlap.
+    // For clearer graphs with many participants, we use a circular layout.
+    // For 1-2 participants, keep a simple left/right layout.
     var positions = {};
-    for (var i = 0; i < participants.length; i++) {
-      var name = participants[i];
-      var sideLeft = i % 2 === 0;
-      var x = sideLeft ? leftX : rightX;
-      var y = padY + i * 60;
-      positions[name] = { x: x, y: y, sideLeft: sideLeft };
+    if (participants.length <= 2) {
+      var leftX = padX;
+      var rightX = width - padX - nodeW;
+      var y0 = Math.max(padY, height / 2 - nodeH / 2);
+      positions[participants[0]] = { x: leftX, y: y0, sideLeft: true };
+      if (participants.length === 2) {
+        positions[participants[1]] = { x: rightX, y: y0, sideLeft: false };
+      }
+    } else {
+      var cx = width / 2;
+      var cy = height / 2;
+      var rx = Math.max(180, (width - 2 * padX - nodeW) / 2);
+      var ry = Math.max(150, (height - 2 * padY - nodeH) / 2);
+      for (var i = 0; i < participants.length; i++) {
+        var name = participants[i];
+        var angle = (2 * Math.PI * i) / participants.length - Math.PI / 2;
+        var x = cx + rx * Math.cos(angle) - nodeW / 2;
+        var y = cy + ry * Math.sin(angle) - nodeH / 2;
+        positions[name] = { x: x, y: y, sideLeft: x < cx };
+      }
     }
 
-    // Draw edges first (under nodes)
+    // Merge edges between the same pair to reduce clutter:
+    // label becomes "A, B, C" (unique) for multiple exchanges.
+    var merged = {};
     flows.forEach(function (f) {
+      if (!f || !f.from || !f.to) return;
+      var key = f.from + "->" + f.to;
+      if (!merged[key]) merged[key] = { from: f.from, to: f.to, labels: {} };
+      var lab = f.label || "exchange";
+      merged[key].labels[lab] = true;
+    });
+    var mergedEdges = Object.keys(merged).map(function (k) {
+      var e = merged[k];
+      var labels = Object.keys(e.labels);
+      labels.sort();
+      return { from: e.from, to: e.to, label: labels.join(", ") };
+    });
+
+    // Draw edges first (under nodes)
+    mergedEdges.forEach(function (f) {
       var from = positions[f.from];
       var to = positions[f.to];
       if (!from || !to) return;
 
-      var fromX = from.x + (from.sideLeft ? nodeW : 0);
-      var toX = to.x + (to.sideLeft ? 0 : nodeW);
-      var fromY = from.y + nodeH / 2;
-      var toY = to.y + nodeH / 2;
+      var fromCenterX = from.x + nodeW / 2;
+      var fromCenterY = from.y + nodeH / 2;
+      var toCenterX = to.x + nodeW / 2;
+      var toCenterY = to.y + nodeH / 2;
 
-      var c1x = fromX + (from.sideLeft ? columnGap * 0.35 : -columnGap * 0.35);
-      var c2x = toX + (to.sideLeft ? columnGap * 0.35 : -columnGap * 0.35);
+      // Connect from center to center using a quadratic-ish bezier.
+      var dx = toCenterX - fromCenterX;
+      var dy = toCenterY - fromCenterY;
+      var dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+      var nx = -dy / dist;
+      var ny = dx / dist;
+      var bend = Math.min(90, Math.max(30, dist * 0.18));
+      var c1x = fromCenterX + dx * 0.35 + nx * bend;
+      var c1y = fromCenterY + dy * 0.35 + ny * bend;
+      var c2x = fromCenterX + dx * 0.65 + nx * bend;
+      var c2y = fromCenterY + dy * 0.65 + ny * bend;
 
       var path = createSvg("path");
       path.setAttribute(
         "d",
         "M " +
-          fromX +
+          fromCenterX +
           " " +
-          fromY +
+          fromCenterY +
           " C " +
           c1x +
           " " +
-          fromY +
+          c1y +
           ", " +
           c2x +
           " " +
-          toY +
+          c2y +
           ", " +
-          toX +
+          toCenterX +
           " " +
-          toY
+          toCenterY
       );
       path.setAttribute("class", "config-analyzer-graph-edge");
       path.setAttribute("marker-end", "url(#config-analyzer-arrow)");
@@ -99,8 +137,8 @@
       // Label near the midpoint
       var label = createSvg("text");
       label.setAttribute("class", "config-analyzer-graph-edge-label");
-      var midX = (fromX + toX) / 2;
-      var midY = (fromY + toY) / 2 - 6;
+      var midX = (fromCenterX + toCenterX) / 2 + nx * (bend * 0.4);
+      var midY = (fromCenterY + toCenterY) / 2 + ny * (bend * 0.4) - 6;
       label.setAttribute("x", String(midX));
       label.setAttribute("y", String(midY));
       label.setAttribute("text-anchor", "middle");
