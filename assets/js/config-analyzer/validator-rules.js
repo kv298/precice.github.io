@@ -40,6 +40,11 @@
       participantNames[p.name] = (participantNames[p.name] || 0) + 1;
     });
 
+    var knownParticipants = {};
+    Object.keys(participantNames).forEach(function (p) {
+      knownParticipants[p] = true;
+    });
+
     // Rule 4: duplicates
     Object.keys(meshNames).forEach(function (name) {
       if (meshNames[name] > 1) {
@@ -67,17 +72,24 @@
       }
     });
 
-    // Rule 2: meshes unused by participants
+    // Rule 2: meshes unused (participants OR exchanges OR mappings)
     var usedMeshes = {};
     model.participants.forEach(function (p) {
       (p.meshes || []).forEach(function (m) {
         usedMeshes[m] = true;
       });
     });
+    model.mappings.forEach(function (map) {
+      if (map.from) usedMeshes[map.from] = true;
+      if (map.to) usedMeshes[map.to] = true;
+    });
+    model.exchanges.forEach(function (ex) {
+      if (ex.mesh) usedMeshes[ex.mesh] = true;
+    });
     model.meshes.forEach(function (m) {
       if (!usedMeshes[m.name]) {
         messages.push(
-          makeMessage("warning", 'Mesh "' + m.name + '" defined but never used by any participant.', {
+          makeMessage("warning", 'Mesh "' + m.name + '" defined but never used.', {
             nodeSignature: signatureForNode(m._node),
           })
         );
@@ -129,6 +141,37 @@
       }
     });
 
+    // Rule 6: unknown participants referenced in exchanges
+    model.exchanges.forEach(function (ex) {
+      if (ex.from && !knownParticipants[ex.from]) {
+        messages.push(
+          makeMessage("error", 'Unknown participant "' + ex.from + '" referenced in exchange (from).', {
+            nodeSignature: signatureForNode(ex._node),
+          })
+        );
+      }
+      if (ex.to && !knownParticipants[ex.to]) {
+        messages.push(
+          makeMessage("error", 'Unknown participant "' + ex.to + '" referenced in exchange (to).', {
+            nodeSignature: signatureForNode(ex._node),
+          })
+        );
+      }
+    });
+
+    // Rule 7: exchanges referencing undefined meshes
+    model.exchanges.forEach(function (ex) {
+      if (ex.mesh && !meshNames[ex.mesh]) {
+        messages.push(
+          makeMessage(
+            "error",
+            'Exchange references undefined mesh "' + ex.mesh + '".',
+            { nodeSignature: signatureForNode(ex._node) }
+          )
+        );
+      }
+    });
+
     // Best-effort: attach line numbers if we can find stable tokens.
     if (xmlHelpers && xmlHelpers.getLineNumberForText && xmlText) {
       messages.forEach(function (msg) {
@@ -139,6 +182,8 @@
           msg.line = xmlHelpers.getLineNumberForText(xmlText, "<mesh", 1);
         } else if (msg.nodeSignature && msg.nodeSignature.indexOf("mapping") === 0) {
           msg.line = xmlHelpers.getLineNumberForText(xmlText, "<mapping", 1);
+        } else if (msg.nodeSignature && msg.nodeSignature.indexOf("exchange") === 0) {
+          msg.line = xmlHelpers.getLineNumberForText(xmlText, "<exchange", 1);
         }
       });
     }
